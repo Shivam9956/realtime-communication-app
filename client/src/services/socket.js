@@ -5,10 +5,17 @@
 import { io } from 'socket.io-client';
 
 const getSocketUrl = () => {
-  if (typeof window !== 'undefined' && window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    return `${window.location.protocol}//${window.location.hostname}:5000`;
+  if (import.meta.env.VITE_SOCKET_URL) {
+    return import.meta.env.VITE_SOCKET_URL;
   }
-  return import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+  if (typeof window !== 'undefined' && window.location.hostname) {
+    const host = window.location.hostname;
+    const isLocalIP = /^(\d{1,3}\.){3}\d{1,3}$/.test(host);
+    if (isLocalIP) {
+      return `http://${host}:5000`;
+    }
+  }
+  return 'http://localhost:5000';
 };
 
 let socket = null;
