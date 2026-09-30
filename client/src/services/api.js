@@ -3,6 +3,8 @@
  * Communicates with the Express backend REST API
  */
 
+const PROD_BACKEND_URL = 'https://realtime-communication-app-saty.onrender.com';
+
 const getApiBaseUrl = () => {
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
@@ -13,8 +15,11 @@ const getApiBaseUrl = () => {
     if (isLocalIP) {
       return `http://${host}:5000/api`;
     }
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return 'http://localhost:5000/api';
+    }
   }
-  return 'http://localhost:5000/api';
+  return `${PROD_BACKEND_URL}/api`;
 };
 
 class ApiService {

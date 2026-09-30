@@ -4,6 +4,8 @@
  */
 import { io } from 'socket.io-client';
 
+const PROD_BACKEND_URL = 'https://realtime-communication-app-saty.onrender.com';
+
 const getSocketUrl = () => {
   if (import.meta.env.VITE_SOCKET_URL) {
     return import.meta.env.VITE_SOCKET_URL;
@@ -14,8 +16,11 @@ const getSocketUrl = () => {
     if (isLocalIP) {
       return `http://${host}:5000`;
     }
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return 'http://localhost:5000';
+    }
   }
-  return 'http://localhost:5000';
+  return PROD_BACKEND_URL;
 };
 
 let socket = null;
