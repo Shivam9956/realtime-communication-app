@@ -6,19 +6,27 @@ import { io } from 'socket.io-client';
 
 const PROD_BACKEND_URL = 'https://realtime-communication-app-saty.onrender.com';
 
-const getSocketUrl = () => {
-  if (import.meta.env.VITE_SOCKET_URL) {
-    return import.meta.env.VITE_SOCKET_URL;
-  }
-  if (typeof window !== 'undefined' && window.location.hostname) {
+export const getSocketUrl = () => {
+  const envUrl = import.meta.env.VITE_SOCKET_URL;
+
+  if (typeof window !== 'undefined' && window.location?.hostname) {
     const host = window.location.hostname;
-    const isLocalIP = /^(\d{1,3}\.){3}\d{1,3}$/.test(host);
-    if (isLocalIP) {
+    const isLocal = host === 'localhost' || host === '127.0.0.1' || /^(\d{1,3}\.){3}\d{1,3}$/.test(host);
+
+    if (isLocal) {
+      if (envUrl) return envUrl;
       return `http://${host}:5000`;
     }
-    if (host === 'localhost' || host === '127.0.0.1') {
-      return 'http://localhost:5000';
+
+    // In deployed environment (Vercel, custom domain)
+    if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+      return envUrl;
     }
+    return PROD_BACKEND_URL;
+  }
+
+  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+    return envUrl;
   }
   return PROD_BACKEND_URL;
 };

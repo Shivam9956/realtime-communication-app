@@ -5,26 +5,34 @@
 
 const PROD_BACKEND_URL = 'https://realtime-communication-app-saty.onrender.com';
 
-const getApiBaseUrl = () => {
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
-  }
-  if (typeof window !== 'undefined' && window.location.hostname) {
+export const getApiBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+
+  if (typeof window !== 'undefined' && window.location?.hostname) {
     const host = window.location.hostname;
-    const isLocalIP = /^(\d{1,3}\.){3}\d{1,3}$/.test(host);
-    if (isLocalIP) {
+    const isLocal = host === 'localhost' || host === '127.0.0.1' || /^(\d{1,3}\.){3}\d{1,3}$/.test(host);
+
+    if (isLocal) {
+      if (envUrl) return envUrl;
       return `http://${host}:5000/api`;
     }
-    if (host === 'localhost' || host === '127.0.0.1') {
-      return 'http://localhost:5000/api';
+
+    // In deployed environment (Vercel, custom domain)
+    if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+      return envUrl;
     }
+    return `${PROD_BACKEND_URL}/api`;
+  }
+
+  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+    return envUrl;
   }
   return `${PROD_BACKEND_URL}/api`;
 };
 
 class ApiService {
-  constructor() {
-    this.baseUrl = getApiBaseUrl();
+  get baseUrl() {
+    return getApiBaseUrl();
   }
 
   /**
