@@ -54,7 +54,17 @@ if (env.NODE_ENV === 'development') {
 // 2. Static uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// 3. API Routes
+// 3. Root & API Routes
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'OmniSync Real-Time Communication API Server is running smoothly! 🚀',
+    status: 'online',
+    healthCheck: '/api/health',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.use('/api', routes);
 
 // 4. Fallback and Error Handling
